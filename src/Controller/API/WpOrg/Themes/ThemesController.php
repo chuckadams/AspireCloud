@@ -14,18 +14,21 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 
-class ThemesController extends BaseController {
+class ThemesController extends BaseController
+{
 
-    public function __construct(private SyncThemeRepository $repository, private EntityManagerInterface $em) {}
+    public function __construct(
+        private readonly SyncThemeRepository $repository,
+        private readonly EntityManagerInterface $em,
+    ) {}
 
 
     #[Route('/themes/info/{version}')]
     public function info(
         Request $request,
         string $version,
-        #[MapQueryParameter] string $action
-    ): Response
-    {
+        #[MapQueryParameter] string $action,
+    ): Response {
         $response = match ($action) {
             'query_themes' => $this->doQueryThemes(QueryThemesRequest::fromRequest($request)),
             'theme_information' => $this->doThemeInformation(ThemeInformationRequest::fromRequest($request)),
@@ -63,7 +66,7 @@ class ThemesController extends BaseController {
         //     ->toArray();
         // $total = DB::table('themes')->count();
 
-        $pageInfo = new PageInfo(page: $page, pages: (int) ceil($total / $perPage), results: $total);
+        $pageInfo = new PageInfo(page: $page, pages: (int)ceil($total / $perPage), results: $total);
         return new QueryThemesResponse($pageInfo, $themes);
     }
 
@@ -89,7 +92,7 @@ class ThemesController extends BaseController {
     {
         return $this->sendResponse(
             ['error' => 'Action not implemented. <a href="https://codex.wordpress.org/WordPress.org_API">API Docs</a>";}'],
-            404
+            404,
         );
     }
 
